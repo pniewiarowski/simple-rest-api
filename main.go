@@ -1,10 +1,13 @@
 package main
 
 import (
-	"flag"
+	"github.com/joho/godotenv"
 	"github.com/pniewiarowski/simple-rest-api/app"
 	"github.com/pniewiarowski/simple-rest-api/database"
 	"github.com/pniewiarowski/simple-rest-api/models"
+	"log"
+	"os"
+	"strconv"
 )
 
 var Models = []interface{}{
@@ -13,19 +16,30 @@ var Models = []interface{}{
 }
 
 func main() {
-	var db string
-	var port int
-	var migration bool
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("create .env file first")
+		return
+	}
 
-	flag.StringVar(&db, "database", "database", "Name for application database.")
-	flag.IntVar(&port, "port", 7070, "Port for application server.")
-	flag.BoolVar(&migration, "migration", true, "Should application make model migration.")
-	flag.Parse()
+	db := os.Getenv("DATABASE")
+
+	port, err := strconv.ParseInt(os.Getenv("PORT"), 10, 32)
+	if err != nil {
+		log.Fatal("port in .env file should be a number")
+		return
+	}
+
+	migration, err := strconv.ParseBool(os.Getenv("MIGRATION"))
+	if err != nil {
+		log.Fatal("migration in .env file should be a boolean")
+		return
+	}
 
 	database.Setup(db)
 	if migration {
 		database.MakeMigration(Models)
 	}
 
-	app.Run(port)
+	app.Run(int(port))
 }
