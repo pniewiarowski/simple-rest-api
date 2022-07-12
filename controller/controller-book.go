@@ -10,12 +10,9 @@ import (
 func GetBook(ctx *fiber.Ctx) error {
 	var book models.Book
 
-	database.DataBase.First(
-		&book,
-		ctx.Params("id"),
-	)
+	database.DataBase.First(&book, ctx.Params("id"))
 
-	return ctx.Status(500).JSON(&fiber.Map{
+	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
 		"book":    book,
 	})
@@ -23,9 +20,10 @@ func GetBook(ctx *fiber.Ctx) error {
 
 func GetAllBook(ctx *fiber.Ctx) error {
 	var books []models.Book
+
 	database.DataBase.Find(&books)
 
-	return ctx.Status(500).JSON(&fiber.Map{
+	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
 		"books":   books,
 	})
@@ -35,7 +33,6 @@ func CreateBook(ctx *fiber.Ctx) error {
 	book := new(models.Book)
 
 	if err := ctx.BodyParser(book); err != nil {
-		log.Println(err)
 		return ctx.Status(400).JSON(&fiber.Map{
 			"success": false,
 			"error":   err,
@@ -44,7 +41,7 @@ func CreateBook(ctx *fiber.Ctx) error {
 
 	database.DataBase.Create(&book)
 
-	return ctx.Status(500).JSON(&fiber.Map{
+	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
 		"book":    book,
 	})
@@ -65,10 +62,11 @@ func UpdateBook(ctx *fiber.Ctx) error {
 	}
 
 	database.DataBase.Model(book).Updates(updatedBook)
+	updatedBook.ID = book.ID
 
-	return ctx.Status(500).JSON(&fiber.Map{
+	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
-		"book":    book,
+		"book":    updatedBook,
 	})
 }
 
@@ -78,7 +76,7 @@ func DeleteBook(ctx *fiber.Ctx) error {
 
 	var books []models.Book
 	database.DataBase.Find(&books)
-	return ctx.Status(500).JSON(&fiber.Map{
+	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
 		"books":   books,
 	})

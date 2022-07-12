@@ -9,12 +9,10 @@ import (
 
 func Run(port int) {
 	app := fiber.New()
+	api := app.Group("/api")
 
-	router.SetupBook(app)
+	router.SetupBook(api)
+	router.SetupAuthor(api)
 
-	log.Fatal(
-		app.Listen(
-			fmt.Sprintf(":%d", port),
-		),
-	)
+	log.Fatal(app.Listen(fmt.Sprintf(":%d", port)))
 }
