@@ -1,2 +1,2 @@
-# simple-rest-api
+# Simple REST API
 Simple REST API in GO
