@@ -1,10 +1,19 @@
 package database
 
-func MakeMigration(models []interface{}) {
-	for _, model := range models {
-		err := DataBase.AutoMigrate(&model)
-		if err != nil {
-			panic("could not make migration for registered models")
-		}
+import (
+	"fmt"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
+
+var DataBase *gorm.DB
+
+func Setup(database string) {
+	database = fmt.Sprintf("%s.db", database)
+	db, err := gorm.Open(sqlite.Open(database), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
 	}
+
+	DataBase = db
 }

@@ -20,7 +20,7 @@ func GetAuthor(ctx *fiber.Ctx) error {
 func GetAllAuthor(ctx *fiber.Ctx) error {
 	var authors []models.Author
 
-	database.DataBase.First(&authors)
+	database.DataBase.Find(&authors)
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -49,6 +49,8 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 func UpdateAuthor(ctx *fiber.Ctx) error {
 	var author models.Author
 	updatedAuthor := new(models.Author)
+
+	database.DataBase.First(&author, ctx.Params("id"))
 
 	if err := ctx.BodyParser(&updatedAuthor); err != nil {
 		return ctx.Status(400).JSON(&fiber.Map{

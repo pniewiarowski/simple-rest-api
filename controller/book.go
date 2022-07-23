@@ -76,6 +76,7 @@ func DeleteBook(ctx *fiber.Ctx) error {
 
 	var books []models.Book
 	database.DataBase.Find(&books)
+
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
 		"books":   books,

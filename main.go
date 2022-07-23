@@ -1,13 +1,10 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
 	"github.com/pniewiarowski/simple-rest-api/app"
 	"github.com/pniewiarowski/simple-rest-api/database"
+	"github.com/pniewiarowski/simple-rest-api/env"
 	"github.com/pniewiarowski/simple-rest-api/models"
-	"log"
-	"os"
-	"strconv"
 )
 
 var Models = []interface{}{
@@ -16,25 +13,11 @@ var Models = []interface{}{
 }
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("create .env file first")
-		return
-	}
+	env.Load(".env")
 
-	db := os.Getenv("DATABASE")
-
-	port, err := strconv.ParseInt(os.Getenv("PORT"), 10, 32)
-	if err != nil {
-		log.Fatal("port in .env file should be a number")
-		return
-	}
-
-	migration, err := strconv.ParseBool(os.Getenv("MIGRATION"))
-	if err != nil {
-		log.Fatal("migration in .env file should be a boolean")
-		return
-	}
+	db := env.GetDb()
+	migration := env.GetMigration()
+	port := env.GetPort()
 
 	database.Setup(db)
 	if migration {
