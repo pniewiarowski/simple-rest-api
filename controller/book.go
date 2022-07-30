@@ -11,6 +11,7 @@ func GetBook(ctx *fiber.Ctx) error {
 	var book models.Book
 
 	database.DataBase.First(&book, ctx.Params("id"))
+	database.DataBase.Preload("Author").Find(&book)
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -22,6 +23,7 @@ func GetAllBook(ctx *fiber.Ctx) error {
 	var books []models.Book
 
 	database.DataBase.Find(&books)
+	database.DataBase.Preload("Author").Find(&books)
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -40,6 +42,7 @@ func CreateBook(ctx *fiber.Ctx) error {
 	}
 
 	database.DataBase.Create(&book)
+	database.DataBase.Preload("Author").Find(&book)
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -63,6 +66,7 @@ func UpdateBook(ctx *fiber.Ctx) error {
 
 	database.DataBase.Model(book).Updates(updatedBook)
 	updatedBook.ID = book.ID
+	database.DataBase.Preload("Author").Find(&updatedBook)
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -76,6 +80,7 @@ func DeleteBook(ctx *fiber.Ctx) error {
 
 	var books []models.Book
 	database.DataBase.Find(&books)
+	database.DataBase.Preload("Author").Find(&books)
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
