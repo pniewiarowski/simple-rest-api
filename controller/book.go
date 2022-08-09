@@ -2,16 +2,18 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/pniewiarowski/simple-rest-api/database"
 	"github.com/pniewiarowski/simple-rest-api/models"
-	"log"
 )
 
 func GetBook(ctx *fiber.Ctx) error {
-	var book models.Book
+	book, err := models.GetBookByID(ctx.Params("id"))
 
-	database.DataBase.First(&book, ctx.Params("id"))
-	database.DataBase.Preload("Author").Find(&book)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -20,10 +22,14 @@ func GetBook(ctx *fiber.Ctx) error {
 }
 
 func GetAllBook(ctx *fiber.Ctx) error {
-	var books []models.Book
+	books, err := models.GetAllBooks()
 
-	database.DataBase.Find(&books)
-	database.DataBase.Preload("Author").Find(&books)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -33,7 +39,6 @@ func GetAllBook(ctx *fiber.Ctx) error {
 
 func CreateBook(ctx *fiber.Ctx) error {
 	book := new(models.Book)
-
 	if err := ctx.BodyParser(book); err != nil {
 		return ctx.Status(400).JSON(&fiber.Map{
 			"success": false,
@@ -41,8 +46,13 @@ func CreateBook(ctx *fiber.Ctx) error {
 		})
 	}
 
-	database.DataBase.Create(&book)
-	database.DataBase.Preload("Author").Find(&book)
+	book, err := models.CreateBook(book)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -51,22 +61,29 @@ func CreateBook(ctx *fiber.Ctx) error {
 }
 
 func UpdateBook(ctx *fiber.Ctx) error {
-	var book models.Book
 	updatedBook := new(models.Book)
-
-	database.DataBase.First(&book, ctx.Params("id"))
-
 	if err := ctx.BodyParser(updatedBook); err != nil {
-		log.Println(err)
 		return ctx.Status(400).JSON(&fiber.Map{
 			"success": false,
 			"error":   err,
 		})
 	}
 
-	database.DataBase.Model(book).Updates(updatedBook)
-	updatedBook.ID = book.ID
-	database.DataBase.Preload("Author").Find(&updatedBook)
+	book, err := models.GetBookByID(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
+
+	updatedBook, err = models.UpdateBook(&book, updatedBook)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -75,12 +92,14 @@ func UpdateBook(ctx *fiber.Ctx) error {
 }
 
 func DeleteBook(ctx *fiber.Ctx) error {
-	var book models.Book
-	database.DataBase.Delete(&book, ctx.Params("id"))
+	books, err := models.DeleteBook(ctx.Params("id"))
 
-	var books []models.Book
-	database.DataBase.Find(&books)
-	database.DataBase.Preload("Author").Find(&books)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,

@@ -2,14 +2,18 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/pniewiarowski/simple-rest-api/database"
 	"github.com/pniewiarowski/simple-rest-api/models"
 )
 
 func GetAuthor(ctx *fiber.Ctx) error {
-	var author models.Author
+	author, err := models.GetAuthorByID(ctx.Params("id"))
 
-	database.DataBase.First(&author, ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -18,9 +22,14 @@ func GetAuthor(ctx *fiber.Ctx) error {
 }
 
 func GetAllAuthor(ctx *fiber.Ctx) error {
-	var authors []models.Author
+	authors, err := models.GetAllAuthors()
 
-	database.DataBase.Find(&authors)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -30,15 +39,20 @@ func GetAllAuthor(ctx *fiber.Ctx) error {
 
 func CreateAuthor(ctx *fiber.Ctx) error {
 	author := new(models.Author)
-
-	if err := ctx.BodyParser(&author); err != nil {
+	if err := ctx.BodyParser(author); err != nil {
 		return ctx.Status(400).JSON(&fiber.Map{
 			"success": false,
 			"error":   err,
 		})
 	}
 
-	database.DataBase.Create(author)
+	author, err := models.CreateAuthor(author)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -47,20 +61,29 @@ func CreateAuthor(ctx *fiber.Ctx) error {
 }
 
 func UpdateAuthor(ctx *fiber.Ctx) error {
-	var author models.Author
 	updatedAuthor := new(models.Author)
-
-	database.DataBase.First(&author, ctx.Params("id"))
-
-	if err := ctx.BodyParser(&updatedAuthor); err != nil {
+	if err := ctx.BodyParser(updatedAuthor); err != nil {
 		return ctx.Status(400).JSON(&fiber.Map{
 			"success": false,
 			"error":   err,
 		})
 	}
 
-	database.DataBase.Model(author).Updates(updatedAuthor)
-	updatedAuthor.ID = author.ID
+	author, err := models.GetAuthorByID(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
+
+	updatedAuthor, err = models.UpdateAuthor(&author, updatedAuthor)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
@@ -69,14 +92,17 @@ func UpdateAuthor(ctx *fiber.Ctx) error {
 }
 
 func DeleteAuthor(ctx *fiber.Ctx) error {
-	var author models.Author
-	database.DataBase.Delete(&author, ctx.Params("id"))
+	authors, err := models.DeleteAuthor(ctx.Params("id"))
 
-	var authors []models.Author
-	database.DataBase.Find(&authors)
+	if err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"error":   err,
+		})
+	}
 
 	return ctx.Status(200).JSON(&fiber.Map{
 		"success": true,
-		"author":  authors,
+		"authors": authors,
 	})
 }
