@@ -9,7 +9,7 @@ type Author struct {
 	gorm.Model
 	FirstName  string `json:"first-name"`
 	FamilyName string `json:"family-name"`
-	Books      []Book `json:"books"`
+	Books      []Book `json:"books" gorm:"foreignKey:AuthorID"`
 }
 
 func GetAuthorByID(id string) (Author, error) {

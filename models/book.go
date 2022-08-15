@@ -11,13 +11,12 @@ type Book struct {
 	Description string  `json:"description"`
 	Price       float32 `json:"price"`
 	AuthorID    int     `json:"author-id"`
-	Author      Author  `json:"author" gorm:"foreignKey:AuthorID"`
 }
 
 func GetBookByID(id string) (Book, error) {
 	var book Book
 
-	err := database.DataBase.Preload("Author").First(&book, id).Error
+	err := database.DataBase.First(&book, id).Error
 
 	return book, err
 }
@@ -25,14 +24,14 @@ func GetBookByID(id string) (Book, error) {
 func GetAllBooks() ([]Book, error) {
 	var books []Book
 
-	err := database.DataBase.Preload("Author").Find(&books).Error
+	err := database.DataBase.Find(&books).Error
 
 	return books, err
 }
 
 func CreateBook(book *Book) (*Book, error) {
 	database.DataBase.Create(&book)
-	err := database.DataBase.Preload("Author").Find(&book).Error
+	err := database.DataBase.Find(&book).Error
 
 	return book, err
 }
@@ -42,7 +41,7 @@ func UpdateBook(book *Book, updatedBook *Book) (*Book, error) {
 
 	updatedBook.ID = book.ID
 
-	err := database.DataBase.Preload("Author").Find(&updatedBook).Error
+	err := database.DataBase.Find(&updatedBook).Error
 
 	return updatedBook, err
 }
@@ -56,7 +55,7 @@ func DeleteBook(id string) ([]Book, error) {
 		return []Book{}, err
 	}
 
-	err = database.DataBase.Preload("Author").Find(&books).Error
+	err = database.DataBase.Find(&books).Error
 
 	return books, err
 }
