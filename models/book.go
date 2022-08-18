@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/pniewiarowski/simple-rest-api/database"
 	"gorm.io/gorm"
+
+	"github.com/pniewiarowski/simple-rest-api/database"
 )
 
 type Book struct {

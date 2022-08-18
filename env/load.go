@@ -1,9 +1,10 @@
 package env
 
 import (
-	"github.com/joho/godotenv"
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
 
 func Load(file string) {
@@ -35,4 +36,8 @@ func GetMigration() bool {
 	}
 
 	return migration
+}
+
+func GetPrivateKey() string {
+	return os.Getenv("PRIVATE_KEY")
 }

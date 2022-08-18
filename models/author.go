@@ -1,14 +1,15 @@
 package models
 
 import (
-	"github.com/pniewiarowski/simple-rest-api/database"
 	"gorm.io/gorm"
+
+	"github.com/pniewiarowski/simple-rest-api/database"
 )
 
 type Author struct {
 	gorm.Model
-	FirstName  string `json:"first-name"`
-	FamilyName string `json:"family-name"`
+	FirstName  string `json:"firstname"`
+	FamilyName string `json:"familyname"`
 	Books      []Book `json:"books" gorm:"foreignKey:AuthorID"`
 }
 

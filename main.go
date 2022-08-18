@@ -10,6 +10,7 @@ import (
 var Models = []interface{}{
 	models.Book{},
 	models.Author{},
+	models.Auth{},
 }
 
 func main() {
